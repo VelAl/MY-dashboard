@@ -1,6 +1,6 @@
 # 🧠 Next.js Dashboard App – Learning Project
 
-This project was built as part of the official Next.js course:  
+This project is being built as part of the official Next.js course:  
 🔗 [Learn Next.js – Dashboard App](https://nextjs.org/learn/dashboard-app)
 
 ## 🎯 Purpose
@@ -13,7 +13,7 @@ The goal of this project is to **deepen my understanding of modern web developme
 - Server and Client Components
 - Data fetching with loading and error states
 - Route code-splitting and prefetching
-- React 18 features like `<Suspense>` and async components
+- React features
 
 ## 🛠️ Stack
 
