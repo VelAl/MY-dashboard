@@ -1,7 +1,9 @@
+import { Suspense } from "react";
 import { generateYAxis } from "@/app/lib/utils";
 import { CalendarIcon } from "@heroicons/react/24/outline";
 import { lusitana } from "@/app/ui/fonts";
-import { Revenue } from "@/app/lib/definitions";
+import { fetchRevenue } from "@/app/lib/data";
+import { RevenueChartSkeleton } from "../skeletons";
 
 // This component is representational only.
 // For data visualization UI, can be used next libs:
@@ -9,9 +11,8 @@ import { Revenue } from "@/app/lib/definitions";
 // https://www.chartjs.org/
 // https://airbnb.io/visx/
 
-type T_Props = { revenue: Revenue[] };
-
-export const RevenueChart = async ({ revenue }: T_Props) => {
+const RevenueChart = async () => {
+  const revenue = await fetchRevenue();
   const chartHeight = 350;
 
   const { yAxisLabels, topLabel } = generateYAxis(revenue);
@@ -59,3 +60,9 @@ export const RevenueChart = async ({ revenue }: T_Props) => {
     </div>
   );
 };
+
+export default () => (
+  <Suspense fallback={<RevenueChartSkeleton />}>
+    <RevenueChart />
+  </Suspense>
+);

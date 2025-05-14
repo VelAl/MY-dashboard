@@ -2,11 +2,13 @@ import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import Image from "next/image";
 import { lusitana } from "@/app/ui/fonts";
-import { LatestInvoice } from "@/app/lib/definitions";
+import { fetchLatestInvoices } from "@/app/lib/data";
+import { Suspense } from "react";
+import { LatestInvoicesSkeleton } from "../skeletons";
 
-type T_Props = { latestInvoices: LatestInvoice[] };
+const LatestInvoices = async () => {
+  const latestInvoices = await fetchLatestInvoices();
 
-export const LatestInvoices = async ({ latestInvoices }: T_Props) => {
   return (
     <div className="flex w-full flex-col md:col-span-4">
       <h2 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
@@ -18,10 +20,9 @@ export const LatestInvoices = async ({ latestInvoices }: T_Props) => {
             return (
               <div
                 key={invoice.id}
-                className={clsx(
-                  "flex items-center justify-between py-4",
-                  { "border-t": i !== 0 }
-                )}
+                className={clsx("flex items-center justify-between py-4", {
+                  "border-t": i !== 0,
+                })}
               >
                 <div className="flex items-center">
                   <Image
@@ -57,3 +58,9 @@ export const LatestInvoices = async ({ latestInvoices }: T_Props) => {
     </div>
   );
 };
+
+export default () => (
+  <Suspense fallback={<LatestInvoicesSkeleton />}>
+    <LatestInvoices />
+  </Suspense>
+);

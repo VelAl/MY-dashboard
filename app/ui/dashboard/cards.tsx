@@ -5,6 +5,9 @@ import {
   InboxIcon,
 } from "@heroicons/react/24/outline";
 import { lusitana } from "@/app/ui/fonts";
+import { Suspense } from "react";
+import { CardsSkeleton } from "../skeletons";
+import { fetchCardData } from "@/app/lib/data";
 
 const iconMap = {
   collected: BanknotesIcon,
@@ -14,19 +17,26 @@ const iconMap = {
 };
 
 export default async function CardWrapper() {
-  return (
-    <>
-      {/* NOTE: Uncomment this code in Chapter 9 */}
+  const {
+    numberOfInvoices,
+    numberOfCustomers,
+    totalPaidInvoices,
+    totalPendingInvoices,
+  } = await fetchCardData();
 
-      {/* <Card title="Collected" value={totalPaidInvoices} type="collected" />
-      <Card title="Pending" value={totalPendingInvoices} type="pending" />
-      <Card title="Total Invoices" value={numberOfInvoices} type="invoices" />
-      <Card
-        title="Total Customers"
-        value={numberOfCustomers}
-        type="customers"
-      /> */}
-    </>
+  return (
+    <Suspense fallback={<CardsSkeleton />}>
+      <>
+        <Card title="Collected" value={totalPaidInvoices} type="collected" />
+        <Card title="Pending" value={totalPendingInvoices} type="pending" />
+        <Card title="Total Invoices" value={numberOfInvoices} type="invoices" />
+        <Card
+          title="Total Customers"
+          value={numberOfCustomers}
+          type="customers"
+        />
+      </>
+    </Suspense>
   );
 }
 
@@ -42,7 +52,7 @@ export const Card = ({ title, value, type }: T_Props) => {
   return (
     <div className="rounded-xl bg-gray-50 p-2 shadow-sm border border-sky-200">
       <div className="flex p-4">
-        {Icon && <Icon className="h-5 w-5 text-gray-700" /> }
+        {Icon && <Icon className="h-5 w-5 text-gray-700" />}
         <h3 className="ml-2 text-sm font-medium">{title}</h3>
       </div>
       <p
