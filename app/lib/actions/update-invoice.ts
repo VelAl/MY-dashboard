@@ -3,37 +3,51 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import postgres from "postgres";
-import { z } from "zod";
+import { invoiceFormSchema } from "../shemas";
+
+export type T_State = {
+  errors?: {
+    customerId?: string[];
+    amount?: string[];
+    status?: string[];
+  };
+  message?: string | null;
+};
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
-const invoiceformSchema = z.object({
-  id: z.string(),
-  customerId: z.string(),
-  amount: z.coerce.number().min(1),
-  status: z.enum(["pending", "paid"]),
-  date: z.string(),
-});
+const updInvoiceSchema = invoiceFormSchema.omit({ id: true, date: true });
 
-const updInvoiceSchema = invoiceformSchema.omit({ id: true, date: true });
+export const updateInvoice_A = async (
+  id: string,
+  _: T_State,
+  formData: FormData
+): Promise<T_State> => {
+  const validatedFields = updInvoiceSchema.safeParse(
+    Object.fromEntries(formData)
+  );
 
-export const updateInvoice_A = async (id: string, formData: FormData) => {
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: "Failed to Create Invoice.",
+    };
+  }
+
+  const { customerId, amount, status } = validatedFields.data;
+
+  const amountInCents = amount * 100;
+
   try {
-    const { customerId, amount, status } = updInvoiceSchema.parse({
-      customerId: formData.get("customerId"),
-      amount: formData.get("amount"),
-      status: formData.get("status"),
-    });
-
-    const amountInCents = amount * 100;
-
     await sql`
     UPDATE invoices
     SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
     WHERE id = ${id}
   `;
   } catch (error) {
-    console.error(error);
+    return {
+      message: "Database Error: Failed to Create Invoice.",
+    };
   }
 
   revalidatePath("/dashboard/invoices");

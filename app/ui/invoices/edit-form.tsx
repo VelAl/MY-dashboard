@@ -1,3 +1,5 @@
+"use client";
+
 import { CustomerField, InvoiceForm } from "@/app/lib/definitions";
 import {
   CheckIcon,
@@ -8,14 +10,21 @@ import {
 import Link from "next/link";
 import { Button } from "@/app/ui/button";
 import { updateInvoice_A } from "@/app/lib/actions";
+import { useActionState } from "react";
+import { Spinner } from "@/app/ui/spinner";
 
 type T_Props = { invoice: InvoiceForm; customers: CustomerField[] };
 
 export default function EditInvoiceForm({ invoice, customers }: T_Props) {
   const updateInvoiceWithId = updateInvoice_A.bind(null, invoice.id);
 
+  const [state, formAction, isPending] = useActionState(
+    updateInvoiceWithId,
+    {}
+  );
+
   return (
-    <form action={updateInvoiceWithId}>
+    <form action={formAction}>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
         {/* CUSTOMER MAME */}
         <div className="mb-4">
@@ -28,6 +37,7 @@ export default function EditInvoiceForm({ invoice, customers }: T_Props) {
               name="customerId"
               className="peer block w-full cursor-pointer rounded-md border border-sky-300 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
               defaultValue={invoice.customer_id}
+              aria-describedby="customer-error"
             >
               <option value="" disabled>
                 Select a customer
@@ -39,6 +49,15 @@ export default function EditInvoiceForm({ invoice, customers }: T_Props) {
               ))}
             </select>
             <UserCircleIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-sky-400" />
+          </div>
+
+          <div id="customer-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.customerId &&
+              state.errors.customerId.map((error: string) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  {error}
+                </p>
+              ))}
           </div>
         </div>
 
@@ -56,10 +75,20 @@ export default function EditInvoiceForm({ invoice, customers }: T_Props) {
                 step="0.01"
                 defaultValue={invoice.amount}
                 placeholder="Enter USD amount"
+                aria-describedby="amount-error"
                 className="peer block w-full rounded-md border border-sky-300 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
               />
               <CurrencyDollarIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-sky-400 peer-focus:text-gray-900" />
             </div>
+          </div>
+
+          <div id="amount-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.amount &&
+              state.errors.amount.map((error: string) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  {error}
+                </p>
+              ))}
           </div>
         </div>
 
@@ -76,6 +105,7 @@ export default function EditInvoiceForm({ invoice, customers }: T_Props) {
                   name="status"
                   type="radio"
                   value="pending"
+                  aria-describedby="status-error"
                   defaultChecked={invoice.status === "pending"}
                   className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-sky-400 focus:ring-1"
                 />
@@ -92,6 +122,7 @@ export default function EditInvoiceForm({ invoice, customers }: T_Props) {
                   name="status"
                   type="radio"
                   value="paid"
+                  aria-describedby="status-error"
                   defaultChecked={invoice.status === "paid"}
                   className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-sky-400 focus:ring-1"
                 />
@@ -104,6 +135,15 @@ export default function EditInvoiceForm({ invoice, customers }: T_Props) {
               </div>
             </div>
           </div>
+
+          <div id="status-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.status &&
+              state.errors.status.map((error: string) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  {error}
+                </p>
+              ))}
+          </div>
         </fieldset>
       </div>
 
@@ -114,7 +154,10 @@ export default function EditInvoiceForm({ invoice, customers }: T_Props) {
         >
           Cancel
         </Link>
-        <Button type="submit">Edit Invoice</Button>
+        <Button type="submit" disabled={isPending} className="flex gap-2">
+          {isPending && <Spinner />}
+          {isPending ? "Processing..." : "Update Invoice"}
+        </Button>
       </div>
     </form>
   );

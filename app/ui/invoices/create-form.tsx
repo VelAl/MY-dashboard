@@ -1,3 +1,5 @@
+"use client";
+
 import { CustomerField } from "@/app/lib/definitions";
 import Link from "next/link";
 import {
@@ -8,12 +10,16 @@ import {
 } from "@heroicons/react/24/outline";
 import { Button } from "@/app/ui/button";
 import { createInvoice_A } from "@/app/lib/actions";
+import { useActionState } from "react";
+import { Spinner } from "@/app/ui/spinner";
 
 type T_Props = { customers: CustomerField[] };
 
 export default function Form({ customers }: T_Props) {
+  const [state, formAction, isPending] = useActionState(createInvoice_A, {});
+
   return (
-    <form action={createInvoice_A}>
+    <form action={formAction} aria-describedby="form-error">
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
         {/* CUSTOMER NAME */}
         <div className="mb-4">
@@ -26,6 +32,7 @@ export default function Form({ customers }: T_Props) {
               name="customerId"
               className="peer block w-full cursor-pointer rounded-md border border-sky-300 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
               defaultValue=""
+              aria-describedby="customer-error"
             >
               <option value="" disabled>
                 Select a customer
@@ -38,6 +45,15 @@ export default function Form({ customers }: T_Props) {
             </select>
             <UserCircleIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-sky-400" />
           </div>
+
+          <div id="customer-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.customerId &&
+              state.errors.customerId.map((error: string) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  {error}
+                </p>
+              ))}
+          </div>
         </div>
 
         {/* INVOICE AMOUNT */}
@@ -48,6 +64,7 @@ export default function Form({ customers }: T_Props) {
           <div className="relative mt-2 rounded-md">
             <div className="relative">
               <input
+                aria-describedby="amount-error"
                 id="amount"
                 name="amount"
                 type="number"
@@ -57,6 +74,15 @@ export default function Form({ customers }: T_Props) {
               />
               <CurrencyDollarIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-sky-400 peer-focus:text-gray-900" />
             </div>
+          </div>
+
+          <div id="amount-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.amount &&
+              state.errors.amount.map((error: string) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  {error}
+                </p>
+              ))}
           </div>
         </div>
 
@@ -69,11 +95,11 @@ export default function Form({ customers }: T_Props) {
             <div className="flex gap-4">
               <div className="flex items-center">
                 <input
-                  defaultChecked
                   id="pending"
                   name="status"
                   type="radio"
                   value="pending"
+                  aria-describedby="status-error"
                   className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-sky-600 focus:ring-1"
                 />
                 <label
@@ -90,6 +116,7 @@ export default function Form({ customers }: T_Props) {
                   name="status"
                   type="radio"
                   value="paid"
+                  aria-describedby="status-error"
                   className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-sky-600 focus:ring-1"
                 />
                 <label
@@ -101,8 +128,24 @@ export default function Form({ customers }: T_Props) {
               </div>
             </div>
           </div>
+
+          <div id="status-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.status &&
+              state.errors.status.map((error: string) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  {error}
+                </p>
+              ))}
+          </div>
         </fieldset>
+
+        <div id="form-error" aria-live="polite" aria-atomic="true">
+          {state.message && (
+            <p className="mt-2 text-sm text-red-500">{state.message}</p>
+          )}
+        </div>
       </div>
+
       <div className="mt-6 flex justify-end gap-4">
         <Link
           href="/dashboard/invoices"
@@ -110,7 +153,10 @@ export default function Form({ customers }: T_Props) {
         >
           Cancel
         </Link>
-        <Button type="submit">Create Invoice</Button>
+        <Button type="submit" disabled={isPending} className="flex gap-2">
+          {isPending && <Spinner />}
+          {isPending ? "Processing..." : "Create Invoice"}
+        </Button>
       </div>
     </form>
   );
