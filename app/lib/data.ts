@@ -150,15 +150,16 @@ export async function fetchInvoiceById(id: string) {
       WHERE invoices.id = ${id};
     `;
 
-    if (!invoice) throw new Error(`Invoice with id "${id}" not found.`);
+    if (!invoice) throw new Error(`Invoice with ID "${id}" not found.`);
 
     // Convert amount from cents to dollars
     invoice.amount /= 100;
 
     return invoice;
   } catch (error) {
-    console.error("Database Error:", error);
-    throw new Error("Failed to fetch invoice.");
+    const msg =
+      error instanceof Error ? error.message : "Failed to fetch invoice.";
+    throw new Error(msg);
   }
 }
 

@@ -18,19 +18,23 @@ const invoiceformSchema = z.object({
 const updInvoiceSchema = invoiceformSchema.omit({ id: true, date: true });
 
 export const updateInvoice_A = async (id: string, formData: FormData) => {
-  const { customerId, amount, status } = updInvoiceSchema.parse({
-    customerId: formData.get("customerId"),
-    amount: formData.get("amount"),
-    status: formData.get("status"),
-  });
+  try {
+    const { customerId, amount, status } = updInvoiceSchema.parse({
+      customerId: formData.get("customerId"),
+      amount: formData.get("amount"),
+      status: formData.get("status"),
+    });
 
-  const amountInCents = amount * 100;
+    const amountInCents = amount * 100;
 
-  await sql`
+    await sql`
     UPDATE invoices
     SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
     WHERE id = ${id}
   `;
+  } catch (error) {
+    console.error(error);
+  }
 
   revalidatePath("/dashboard/invoices");
   redirect("/dashboard/invoices");

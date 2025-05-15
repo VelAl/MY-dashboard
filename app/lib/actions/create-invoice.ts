@@ -18,18 +18,22 @@ const invoiceformSchema = z.object({
 const createInvoiceSchema = invoiceformSchema.omit({ id: true, date: true });
 
 export const createInvoice_A = async (formData: FormData) => {
-  const { customerId, amount, status } = createInvoiceSchema.parse({
-    customerId: formData.get("customerId"),
-    amount: formData.get("amount"),
-    status: formData.get("status"),
-  });
-  const amountInCents = amount * 100;
-  const date = new Date().toISOString().split("T")[0];
+  try {
+    const { customerId, amount, status } = createInvoiceSchema.parse({
+      customerId: formData.get("customerId"),
+      amount: formData.get("amount"),
+      status: formData.get("status"),
+    });
+    const amountInCents = amount * 100;
+    const date = new Date().toISOString().split("T")[0];
 
-  await sql`
+    await sql`
     INSERT INTO invoices (customer_id, amount, status, date)
     VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
   `;
+  } catch (error) {
+    console.error(error);
+  }
 
   revalidatePath("/dashboard/invoices");
   redirect("/dashboard/invoices");
