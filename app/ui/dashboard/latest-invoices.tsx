@@ -21,7 +21,7 @@ const LatestInvoices = async () => {
               <div
                 key={invoice.id}
                 className={clsx("flex items-center justify-between py-4", {
-                  "border-t": i !== 0,
+                  "border-t border-sky-200": i !== 0,
                 })}
               >
                 <div className="flex items-center">

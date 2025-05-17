@@ -6,7 +6,7 @@ import { fetchFilteredInvoices } from "@/app/lib/data";
 
 type T_Props = { query: string; currentPage: number };
 
-export default async function InvoicesTable({ query, currentPage }: T_Props) {
+const InvoicesTable = async ({ query, currentPage }: T_Props) => {
   const invoices = await fetchFilteredInvoices(query, currentPage);
 
   return (
@@ -117,4 +117,6 @@ export default async function InvoicesTable({ query, currentPage }: T_Props) {
       </div>
     </div>
   );
-}
+};
+
+export default InvoicesTable;

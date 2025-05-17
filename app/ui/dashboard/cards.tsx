@@ -52,7 +52,7 @@ export const Card = ({ title, value, type }: T_Props) => {
   return (
     <div className="rounded-xl bg-gray-50 p-2 shadow-sm border border-sky-200">
       <div className="flex p-4">
-        {Icon && <Icon className="h-5 w-5 text-gray-700" />}
+        {Icon && <Icon className="h-5 w-5 text-sky-500" />}
         <h3 className="ml-2 text-sm font-medium">{title}</h3>
       </div>
       <p
