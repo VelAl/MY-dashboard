@@ -5,6 +5,11 @@ import Search from "@/app/ui/search";
 import { InvoicesTableSkeleton } from "@/app/ui/skeletons";
 import { Suspense } from "react";
 import Table from "@/app/ui/customers/table";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Customers",
+};
 
 type T_Props = {
   searchParams?: Promise<{ query?: string; page?: string }>;
