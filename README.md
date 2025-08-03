@@ -1,6 +1,6 @@
 # 🧠 Next.js Dashboard App – Learning Project
 
-This project is being built as part of the official Next.js course:  
+This project was built as part of the official Next.js course:  
 🔗 [Learn Next.js – Dashboard App](https://nextjs.org/learn/dashboard-app)
 
 ## 🖼️ Preview
